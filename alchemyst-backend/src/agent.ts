@@ -5,8 +5,6 @@ let globalSeq = 1;
 export function processPrompt(ws: WebSocket, prompt: string) {
   console.log(`📥 Received prompt: ${prompt}`);
   const streamId = `s_${Date.now()}`;
-
-  // 1. Fire the Context Snapshot (Triggers your Task 3 JSON Inspector)
   ws.send(JSON.stringify({
     type: "CONTEXT_SNAPSHOT",
     seq: globalSeq++,
@@ -22,7 +20,6 @@ export function processPrompt(ws: WebSocket, prompt: string) {
     }
   }));
 
-  // 2. Stream the first part of the text (Triggers Task 1 & 2)
   const intro = "Analyzing network logs based on current context... ";
   let i = 0;
   
@@ -32,9 +29,7 @@ export function processPrompt(ws: WebSocket, prompt: string) {
       i++;
     } else {
       clearInterval(streamIntro);
-      
-      // 3. Interrupt with a TOOL CALL mid-sentence
-      const callId = `tc_${Date.now()}`;
+            const callId = `tc_${Date.now()}`;
       ws.send(JSON.stringify({
         type: "TOOL_CALL",
         seq: globalSeq++,
@@ -53,8 +48,6 @@ export function processPrompt(ws: WebSocket, prompt: string) {
           result: { threats_found: 3, action: "quarantine" },
           stream_id: streamId
         }));
-
-        // 5. Resume Streaming instantly
         const outro = "Found 3 relevant contextual anomalies. Quarantine protocols initiated. System secure.";
         let j = 0;
         const streamOutro = setInterval(() => {
@@ -69,5 +62,5 @@ export function processPrompt(ws: WebSocket, prompt: string) {
 
       }, 2500);
     }
-  }, 30); // 30ms delay between characters to simulate real AI typing
+  }, 30);
 }
